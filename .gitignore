@@ -1,0 +1,8 @@
+# Credenciales locales
+conexion.php
+
+# Editor y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
