@@ -8,8 +8,10 @@ JOIN. Incluye un simulacro que replica la relación de preexamen del profesor.
 
 ## Inicio rápido (Windows + XAMPP)
 
-Requisito: XAMPP instalado, con **MySQL** en verde en su panel de control
-(Apache solo se usa para abrir phpMyAdmin).
+Requisito: XAMPP instalado, con **Apache** y **MySQL** en verde en su panel de
+control. Apache solo hace falta para abrir phpMyAdmin
+(`http://localhost/phpmyadmin`): los ejercicios los sirve el servidor de PHP
+del paso 4.
 
 1. **Base de datos.** Abre `http://localhost/phpmyadmin`, ve a la pestaña
    *Importar* y sube `sql/centro.sql`. Debe crearse la base `centro` con 4
