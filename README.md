@@ -6,6 +6,63 @@ de datos** de Desarrollo Web en Entorno Servidor (curso 2026/2027).
 Cubre conexión con MySQLi, lectura de resultados, consultas preparadas, CRUD y
 JOIN. Incluye un simulacro que replica la relación de preexamen del profesor.
 
+## Inicio rápido (Windows + XAMPP)
+
+Requisito: XAMPP instalado, con **MySQL** en verde en su panel de control
+(Apache solo se usa para abrir phpMyAdmin).
+
+1. **Base de datos.** Abre `http://localhost/phpmyadmin`, ve a la pestaña
+   *Importar* y sube `sql/centro.sql`. Debe crearse la base `centro` con 4
+   alumnos, 3 asignaturas y 5 matrículas.
+2. **Usuario de la aplicación.** En la pestaña *SQL* de phpMyAdmin ejecuta
+   (cambia `TU_CLAVE` por la clave que quieras usar):
+
+   ```sql
+   CREATE USER 'dwes_app'@'localhost' IDENTIFIED BY 'TU_CLAVE';
+   GRANT SELECT, INSERT, UPDATE, DELETE ON centro.* TO 'dwes_app'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+   Si dice que el usuario ya existe, ponle la clave y los permisos con:
+
+   ```sql
+   ALTER USER 'dwes_app'@'localhost' IDENTIFIED BY 'TU_CLAVE';
+   GRANT SELECT, INSERT, UPDATE, DELETE ON centro.* TO 'dwes_app'@'localhost';
+   FLUSH PRIVILEGES;
+   ```
+
+3. **Conexión.** Desde la carpeta del repositorio, en PowerShell:
+
+   ```powershell
+   Copy-Item conexion.example.php conexion.php
+   ```
+
+   Abre `conexion.php` y pon la misma `TU_CLAVE`. Este archivo está en
+   `.gitignore`: no se sube al repositorio.
+4. **Servidor.** Desde la carpeta del repositorio, arranca el servidor de PHP
+   que trae XAMPP:
+
+   ```powershell
+   & "C:\xampp\php\php.exe" -S localhost:8000
+   ```
+
+   Deja esa ventana abierta mientras practicas. Si instalaste XAMPP en otra
+   carpeta, cambia la ruta. Si prefieres escribir solo `php -S localhost:8000`,
+   añade `C:\xampp\php` a la variable de entorno `Path` y abre una ventana
+   nueva de PowerShell.
+5. **Abrir los niveles** en el navegador:
+
+   - `http://localhost:8000/basicos/`
+   - `http://localhost:8000/medios/`
+   - `http://localhost:8000/avanzados/`
+   - `http://localhost:8000/simulacro/`
+
+6. **Probar.** En `basicos`, copia `soluciones/ejercicio01.php` sobre
+   `ejercicios/ejercicio01.php` y pulsa el botón del ejercicio 1: debe salir
+   «Conexión correcta».
+
+Si algo falla, mira el apartado [Si no aparece nada o hay un error](#si-no-aparece-nada-o-hay-un-error).
+
 ## Organización del repositorio
 
 ```text
@@ -69,28 +126,15 @@ Los ejercicios 1 a 3 de `basicos`, 1 a 5 de `medios`, 1 a 5 de `avanzados` y
 1 a 3 de `simulacro` replican la relación de preexamen del profesor. El resto
 son variantes para practicar el mismo patrón.
 
-## Cómo ponerlo en marcha
+## Otros sistemas
 
-Requisitos: PHP 8.2 o posterior con la extensión `mysqli` (y `mysqlnd`), y
-MySQL o MariaDB.
+Requisitos: PHP 8.2 o posterior con las extensiones `mysqli` y `mysqlnd`, y
+MySQL o MariaDB. Los pasos son los mismos que en el inicio rápido, pero el
+servidor se arranca con:
 
-1. Importa `sql/centro.sql` con tu cliente SQL (una sola vez).
-2. Crea el usuario `dwes_app` con permisos sobre `centro` (hay un ejemplo
-   comentado al final del script).
-3. Copia `conexion.example.php` como `conexion.php` y pon tu clave.
-   `conexion.php` está en `.gitignore`: no se sube al repositorio.
-4. Arranca un servidor PHP desde la raíz del repo:
-
-   ```bash
-   php -S localhost:8000
-   ```
-
-5. Abre cada nivel en el navegador:
-
-   - `http://localhost:8000/basicos/`
-   - `http://localhost:8000/medios/`
-   - `http://localhost:8000/avanzados/`
-   - `http://localhost:8000/simulacro/`
+```bash
+php -S localhost:8000
+```
 
 ## Orden de estudio recomendado
 
@@ -154,12 +198,31 @@ Antes de dar un ejercicio por terminado:
 
 ## Si no aparece nada o hay un error
 
-- Revisa que `conexion.php` exista y que la clave sea correcta.
-- Comprueba que `mysqli` está habilitada (`php -m`).
-- Abre la página desde `php -S`, no con doble clic en el archivo.
-- Mira el log de errores de PHP y la consola del navegador (`F12`).
-- Errores típicos: número de `?` distinto al de variables, tipos mal escritos
-  en `bind_param`, olvidar `execute()` y usar `"?"` entre comillas.
+**`php` no se reconoce como comando.** La carpeta de PHP no está en el `Path`.
+Usa la ruta completa (`& "C:\xampp\php\php.exe" -S localhost:8000`) o añade
+`C:\xampp\php` al `Path` y abre una ventana nueva de PowerShell.
+
+**«No se pudo conectar con la base de datos».** Es un mensaje general a
+propia: el detalle del error se escribe en la ventana de PowerShell donde
+está corriendo `php -S`. Mira esa ventana:
+
+- `Access denied for user 'dwes_app'@'localhost'`: el usuario no existe o la
+  clave de `conexion.php` no coincide. Ejecuta el `ALTER USER` del inicio
+  rápido con la misma clave que pusiste en `conexion.php`.
+- `Unknown database 'centro'`: la base no se llama exactamente `centro` o no
+  has importado `sql/centro.sql`.
+- `(HY000/2002)`: MySQL no está arrancado en XAMPP, o usa otro puerto (añade
+  el puerto como quinto parámetro de `new mysqli(...)`).
+
+**Otros problemas.**
+
+- Comprueba que `mysqli` está habilitada: `php -m` debe listar `mysqli` y
+  `mysqlnd`.
+- Abre la página desde `http://localhost:8000/...`, no con doble clic en el
+  archivo.
+- Mira la consola del navegador (`F12`).
+- Errores típicos de código: número de `?` distinto al de variables, tipos mal
+  escritos en `bind_param`, olvidar `execute()` y usar `"?"` entre comillas.
 - Si queda un alumno de prueba sin borrar en `centro`, elimínalo a mano:
   `DELETE FROM matriculas WHERE dni IN ('77777777A', '88888888B');` y
   `DELETE FROM alumnos WHERE dni IN ('77777777A', '88888888B');`.
